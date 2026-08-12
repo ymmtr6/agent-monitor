@@ -147,13 +147,19 @@ export function CursorLayer() {
   const sessions = useAgentStore((s) => s.sessions);
   const rects = useCardRects();
 
-  const cursors = Object.values(sessions).filter((s) => s.status !== "ended" && rects[s.id]);
+  const cursors = Object.values(sessions).filter(
+    (s) => s.status !== "ended" && rects[`${s.id}:parent`],
+  );
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 5, pointerEvents: "none", overflow: "hidden" }}>
       <AnimatePresence>
         {cursors.map((session) => (
-          <AgentCursor key={session.id} session={session} rect={rects[session.id]} />
+          <AgentCursor
+            key={session.id}
+            session={session}
+            rect={rects[`${session.id}:parent`]}
+          />
         ))}
       </AnimatePresence>
     </div>
