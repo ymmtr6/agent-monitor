@@ -26,6 +26,7 @@
 - `backend/` — Fastify製のNode.jsバックエンド。`~/.claude/projects/<project>/*.jsonl`（depth 1）と `~/.codex/sessions/YYYY/MM/DD/rollout-*.jsonl`（depth 3）を監視し、WebSocketで状態をブロードキャストする
 - `frontend/` — Vite + React + framer-motionのダッシュボード
 - `scripts/install-claude-hooks.mjs` — ClaudeCodeのhooksをAgentMonitorに接続する任意のセットアップスクリプト（`~/.claude/settings.json`を安全に追記する）
+- `scripts/uninstall-claude-hooks.mjs` — AgentMonitorが追加したClaudeCodeのhooksだけを安全に削除するスクリプト
 
 ## Quick Start
 
@@ -69,6 +70,13 @@ node scripts/install-claude-hooks.mjs             # 確認後、実際に反映(
 ```
 
 既存の `~/.claude/settings.json` の hooks（他ツール用のものを含む）は壊さず、配列に追記するだけ。設定後はClaudeCodeを再起動すると反映される。
+
+hooksを削除する場合も、まず変更内容を確認してから実行できる。AgentMonitor以外のhooksとClaude Codeの設定は保持される。
+
+```bash
+npm run hooks:uninstall -- --dry-run   # 削除内容を確認
+npm run hooks:uninstall                # 確認後、削除を反映（バックアップ付き）
+```
 
 **バックグラウンド起動のサブエージェント（`run_in_background: true`）には hooks が必須。** 通常のサブエージェントは `Task`/`Agent` ツールの `tool_use` と `tool_result` の対で開始・終了を判定できるが、バックグラウンド起動の場合 `tool_result` は「起動しました」という応答として即座に返るため、ファイル監視だけでは完了時刻が分からない。`SubagentStop` フックが唯一の完了シグナルになる。フックがない場合は `SUBAGENT_STALE_MS`（30分）で強制終了扱いにする。
 
